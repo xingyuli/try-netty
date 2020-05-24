@@ -2,46 +2,14 @@ package chapter1
 
 import java.util.*
 
-class Movie(var title: String, var priceCode: Int) {
-    companion object {
-        const val CHILDRENS = 2
-        const val REGULAR = 0
-        const val NEW_RELEASE = 1
-    }
-}
-
 class Rental(val movie: Movie, val daysRented: Int) {
 
     fun getCharge(): Double {
-        var result = 0.0
-
-        when (movie.priceCode) {
-            Movie.REGULAR -> {
-                result += 2
-                if (daysRented > 2) {
-                    result += (daysRented - 2) * 1.5
-                }
-            }
-            Movie.NEW_RELEASE -> {
-                result += daysRented * 3
-            }
-            Movie.CHILDRENS -> {
-                result += 1.5
-                if (daysRented > 3) {
-                    result += (daysRented - 3) * 1.5
-                }
-            }
-        }
-
-        return result
+        return movie.getCharge(daysRented)
     }
 
     fun getFrequentRenterPoints(): Int {
-        return if (movie.priceCode == Movie.NEW_RELEASE && daysRented > 1) {
-            2
-        } else {
-            1
-        }
+        return movie.getFrequentRenterPoints(daysRented)
     }
 
 }
