@@ -10,7 +10,41 @@ class Movie(var title: String, var priceCode: Int) {
     }
 }
 
-class Rental(val movie: Movie, val daysRented: Int)
+class Rental(val movie: Movie, val daysRented: Int) {
+
+    fun getCharge(): Double {
+        var result = 0.0
+
+        when (movie.priceCode) {
+            Movie.REGULAR -> {
+                result += 2
+                if (daysRented > 2) {
+                    result += (daysRented - 2) * 1.5
+                }
+            }
+            Movie.NEW_RELEASE -> {
+                result += daysRented * 3
+            }
+            Movie.CHILDRENS -> {
+                result += 1.5
+                if (daysRented > 3) {
+                    result += (daysRented - 3) * 1.5
+                }
+            }
+        }
+
+        return result
+    }
+
+    fun getFrequentRenterPoints(): Int {
+        return if (movie.priceCode == Movie.NEW_RELEASE && daysRented > 1) {
+            2
+        } else {
+            1
+        }
+    }
+
+}
 
 class Customer(val name: String) {
     private val _rentals = Vector<Rental>()
@@ -20,47 +54,61 @@ class Customer(val name: String) {
     }
 
     fun statement(): String {
-        var totalAmount = 0.0
-        var frequentRenterPoints = 0
         val rentals = _rentals.elements()
+
         var result = "Rental Record for $name\n"
         while (rentals.hasMoreElements()) {
-            var thisAmount = 0.0
             val each = rentals.nextElement()
 
-            // determine amounts for each line
-            when (each.movie.priceCode) {
-                Movie.REGULAR -> {
-                    thisAmount += 2
-                    if (each.daysRented > 2) {
-                        thisAmount += (each.daysRented - 2) * 1.5
-                    }
-                }
-                Movie.NEW_RELEASE -> {
-                    thisAmount += each.daysRented * 3
-                }
-                Movie.CHILDRENS -> {
-                    thisAmount += 1.5
-                    if (each.daysRented > 3) {
-                        thisAmount += (each.daysRented - 3) * 1.5
-                    }
-                }
-            }
-
-            // add frequent renter points
-            frequentRenterPoints++
-            // add bonus for a two day new release rental
-            if (each.movie.priceCode == Movie.NEW_RELEASE && each.daysRented > 1) {
-                frequentRenterPoints++
-            }
-
             // show figures for this rental
-            result += "\t${each.movie.title}\t${thisAmount}\n"
-            totalAmount += thisAmount
+            result += "\t${each.movie.title}\t${each.getCharge()}\n"
         }
 
-        result += "Amount owed is ${totalAmount}\n"
-        result += "You earned $frequentRenterPoints frequent renter points"
+        // add footer lines
+        result += "Amount owed is ${getTotalCharge()}\n"
+        result += "You earned ${getTotalFrequentRenterPoints()} frequent renter points"
+
+        return result
+    }
+
+    fun htmlStatement(): String {
+        val rentals = _rentals.elements()
+
+        var result = "<H1>Rentals for <EM>${name}</EM</H1><P>\n"
+        while (rentals.hasMoreElements()) {
+            val each = rentals.nextElement()
+
+            // show figures for each rental
+            result += "${each.movie.title}: ${each.getCharge()}<BR>\n"
+        }
+
+        // add footer lines
+        result += "<P>You owe <EM>${getTotalCharge()}</EM><P>\n"
+        result += "On this rental you earned <EM>${getTotalFrequentRenterPoints()}</EM> frequent renter points<P>"
+
+        return result
+    }
+
+    private fun getTotalCharge(): Double {
+        var result = 0.0
+
+        val rentals = _rentals.elements()
+        while (rentals.hasMoreElements()) {
+            val each = rentals.nextElement()
+            result += each.getCharge()
+        }
+
+        return result
+    }
+
+    private fun getTotalFrequentRenterPoints(): Int {
+        var result = 0
+
+        val rentals = _rentals.elements()
+        while (rentals.hasMoreElements()) {
+            val each = rentals.nextElement()
+            result += each.getFrequentRenterPoints()
+        }
 
         return result
     }
