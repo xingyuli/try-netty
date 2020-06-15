@@ -18,6 +18,7 @@
         <module>chapter9-codec</module>
 
         <module>refactoring</module>
+        <module>articles</module>
     </modules>
 
     <properties>
