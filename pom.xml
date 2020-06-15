@@ -15,6 +15,7 @@
         <module>chapter4</module>
         <module>chapter5-bytebuf</module>
         <module>chapter8</module>
+        <module>chapter9-codec</module>
 
         <module>refactoring</module>
     </modules>
